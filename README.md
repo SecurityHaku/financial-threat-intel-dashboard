@@ -55,6 +55,7 @@
 ## 📁 プロジェクト構成
 
 ```
+<<<<<<< HEAD
 02_threat-intelligence/
 ├── server.py             # ローカル版APIサーバー（フィード取得・キャッシュ・集計）
 ├── index.html            # ローカル版のダッシュボード画面
@@ -70,6 +71,17 @@
 └── data/                 # 実行時に自動生成（Gitには含めません）
     ├── bookmarks.json    # 保存した脅威アイテム・社内メモ
     └── cache/             # 取得したフィードの一時キャッシュ
+=======
+financial-threat-intel-dashboard/
+├── server.py        # ローカルAPIサーバー（フィード取得・キャッシュ・集計）
+├── index.html        # ダッシュボード画面
+├── app.js             # フロントエンドのロジック
+├── app.css            # デザイン
+├── start.bat          # Windows用の起動ショートカット
+└── data/               # 実行時に自動生成（Gitには含めません）
+    ├── bookmarks.json  # 保存した脅威アイテム・社内メモ
+    └── cache/          # 取得したフィードの一時キャッシュ
+>>>>>>> d9799d846c822788bb4bc72cf66f02f00c02b67a
 ```
 
 ## 🔒 セキュリティに関する注意
