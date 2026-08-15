@@ -27,7 +27,7 @@ CACHE_DIR = os.path.join(DATA_DIR, 'cache')
 # fixed allow-list (rather than "serve whatever path was requested") so a
 # request like GET /../server.py or GET /../data/bookmarks.json can never
 # escape this folder or expose source code / internal data.
-ALLOWED_STATIC_FILES = {'index.html', 'app.js', 'app.css'}
+ALLOWED_STATIC_FILES = {'index.html', 'app.js', 'app.css', 'data-adapter.js'}
 
 # A CVE ID always looks like CVE-YYYY-NNNN(...). Validating it before using
 # it to build a URL or a cache filename prevents request/path injection.

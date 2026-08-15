@@ -122,7 +122,7 @@ function updateBadgesAndKPIs() {
     document.getElementById('badge-bookmark-count').textContent = globalBookmarks.length;
 
     document.getElementById('kpi-kev-total').textContent = globalKevData.length;
-    
+
     const finHighCount = globalKevData.filter(v => v.financial_relevance === 'HIGH').length;
     document.getElementById('kpi-fin-high').textContent = finHighCount;
 
@@ -430,7 +430,7 @@ async function searchCustomCve() {
                 </div>
                 <p class="margin-top-sm">${escapeHtml(res.summary)}</p>
                 <div class="margin-top-sm text-sm text-muted">
-                    <strong>CWE:</strong> ${res.cwe} | 
+                    <strong>CWE:</strong> ${res.cwe} |
                     <strong>金融アセット影響度:</strong> ${res.financial_relevance}
                 </div>
                 <div class="margin-top-sm">

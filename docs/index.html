@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>金融機関向け サイバー脅威インテリジェンス・ダッシュボード</title>
+    <title>金融機関向け サイバー脅威インテリジェンス・ダッシュボード (Web Demo)</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,7 +24,7 @@
             </div>
             <div>
                 <h1 class="header-title">FINANCIAL CYBER THREAT DASHBOARD</h1>
-                <p class="header-subtitle">金融サイバー脅威インテリジェンス・野外悪用脆弱性（KEV）/ EPSS 統合監視システム</p>
+                <p class="header-subtitle">金融サイバー脅威インテリジェンス・野外悪用脆弱性（KEV）/ EPSS 統合監視システム — Web Demo版</p>
             </div>
         </div>
 
@@ -82,6 +82,21 @@
 
     <!-- Main Content Container -->
     <main class="main-container">
+
+        <!-- Web Demo Notice -->
+        <div class="demo-banner glass-card margin-bottom">
+            <div class="banner-header">
+                <span class="banner-icon">🌐</span>
+                <strong>これはWeb公開デモ版です</strong>
+            </div>
+            <p class="text-sm text-secondary margin-top-sm">
+                このページはサーバーを持たない静的サイトとして動いています。CISA KEVなど一部のデータは、無料の公開CORSプロキシ経由で取得しているため、
+                プロキシが混雑・停止していると一時的にデータが表示されないことがあります（その場合は「最新情報に更新」を少し時間を置いて試してください）。<br>
+                また、「保存」機能は<strong>あなたのブラウザの中だけ</strong>に保存され、他の訪問者とは共有されません。フル機能・安定動作が必要な場合は、
+                <!-- TODO: 公開後、実際のリポジトリURLに差し替えてください -->
+                <a href="https://github.com/REPLACE_WITH_YOUR_GITHUB_USERNAME/REPLACE_WITH_YOUR_REPO_NAME" target="_blank" rel="noopener noreferrer" class="text-blue">GitHubリポジトリ</a>からダウンロードしてローカルで実行するエディション（<code>server.py</code>）をご利用ください。
+            </p>
+        </div>
 
         <!-- Explanation Banner for Financial Impact Logic -->
         <div class="logic-banner glass-card margin-bottom">
@@ -370,7 +385,7 @@
                 <div class="card-header flex-between">
                     <div>
                         <h2 class="card-title">🔖 保存した脅威・社内報告用レポート出力</h2>
-                        <p class="text-muted text-sm">気になる脆弱性やニュースを保存し、CSIRT・金融庁/FISC報告用サマリーを瞬時に生成します。</p>
+                        <p class="text-muted text-sm">気になる脆弱性やニュースを保存し、CSIRT・金融庁/FISC報告用サマリーを瞬時に生成します。（このブラウザだけに保存されます）</p>
                     </div>
                     <div class="action-buttons">
                         <button class="btn btn-success" id="btn-export-markdown">
@@ -405,7 +420,7 @@
     <!-- Notification Toast -->
     <div id="toast-container" class="toast-container"></div>
 
-    <script src="data-adapter.js"></script>
+    <script src="data-adapter-static.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
