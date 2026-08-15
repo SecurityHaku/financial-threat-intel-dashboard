@@ -1,0 +1,15 @@
+# Runtime data — automatically re-created by server.py on first run.
+# data/bookmarks.json may contain internal notes ("社内メモ"), and
+# data/cache/* is just a temporary cache of fetched feeds — neither
+# should be published to a public repository.
+data/
+
+# Python
+__pycache__/
+*.pyc
+
+# OS / editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>金融機関向け サイバー脅威インテリジェンス・ダッシュボード</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Chart.js for visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="app.css">
+</head>
+<body>
+    <!-- Top Header -->
+    <header class="app-header">
+        <div class="header-branding">
+            <div class="shield-logo">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    <path d="m9 12 2 2 4-4"/>
+                </svg>
+            </div>
+            <div>
+                <h1 class="header-title">FINANCIAL CYBER THREAT DASHBOARD</h1>
+                <p class="header-subtitle">金融サイバー脅威インテリジェンス・野外悪用脆弱性（KEV）/ EPSS 統合監視システム</p>
+            </div>
+        </div>
+
+        <div class="header-controls">
+            <div class="system-status">
+                <span class="status-dot pulse-green"></span>
+                <span class="status-text">LIVE FEEDS ACTIVE</span>
+            </div>
+            <div class="live-clock" id="live-clock">--:--:--</div>
+            <button class="btn btn-primary" id="btn-refresh">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+                </svg>
+                最新情報に更新
+            </button>
+        </div>
+    </header>
+
+    <!-- Global Threat Ticker -->
+    <div class="threat-ticker">
+        <div class="ticker-label">
+            <span class="badge badge-crimson">緊急アナウンス</span>
+        </div>
+        <div class="ticker-content" id="ticker-content">
+            CISA KEV、EPSS、JPCERT/CC、CISA Advisories から最新データを取得中...
+        </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs">
+        <button class="nav-tab active" data-tab="tab-overview">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+            サマリーダッシュボード
+        </button>
+        <button class="nav-tab" data-tab="tab-kev">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            CISA KEV (野外悪用脆弱性)
+            <span class="tab-badge" id="badge-kev-count">...</span>
+        </button>
+        <button class="nav-tab" data-tab="tab-epss">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            Vulnerability & EPSS Hub
+        </button>
+        <button class="nav-tab" data-tab="tab-news">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6Z"/></svg>
+            脅威ニュース & 警報
+            <span class="tab-badge" id="badge-news-count">...</span>
+        </button>
+        <button class="nav-tab" data-tab="tab-bookmarks">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m19 21-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+            保存・社内報告出力
+            <span class="tab-badge badge-amber" id="badge-bookmark-count">0</span>
+        </button>
+    </nav>
+
+    <!-- Main Content Container -->
+    <main class="main-container">
+
+        <!-- Explanation Banner for Financial Impact Logic -->
+        <div class="logic-banner glass-card margin-bottom">
+            <div class="banner-header">
+                <span class="banner-icon">💡</span>
+                <strong>【判定定義】「野外悪用 (In-the-Wild)」および「金融アセット影響度」とは？</strong>
+                <button class="btn btn-sm btn-outline" id="btn-toggle-logic-details" style="margin-left: auto;">詳細ロジック説明を開く</button>
+            </div>
+            <div class="banner-details hidden margin-top-sm" id="banner-logic-details">
+                <p class="text-sm text-secondary">
+                    当ダッシュボードでは、脆弱性の「実際に攻撃で悪用されているか」と「金融機関へのリスク度」を明確に区別して表示しています。
+                </p>
+                <div class="logic-grid margin-top-sm">
+                    <div class="logic-box accent-red-bg">
+                        <strong class="text-red">🚨 野外悪用 (In-the-Wild Exploited)</strong>
+                        <p class="text-xs">CISA KEV等により、実際に野外（サイバー空間）での攻撃・悪用が確認された確定脅威です。最も優先度の高いパッチ対象です。</p>
+                    </div>
+                    <div class="logic-box accent-amber-bg">
+                        <strong class="text-amber">🏦 金融アセット影響度 (HIGH)</strong>
+                        <p class="text-xs">金融機関の境界防御機器 (Fortinet, Palo Alto, Citrix, Cisco VPN)、認証基盤 (Active Directory, Kerberos)、Exchange、VMware等に影響を与えるリスク分類です。</p>
+                    </div>
+                    <div class="logic-box accent-blue-bg">
+                        <strong class="text-blue">📈 EPSS 悪用確率スコア</strong>
+                        <p class="text-xs">FIRST.orgがAI予測する今後30日以内の野外悪用確率（0〜100%）。高スコアなほど攻撃コードが出回っています。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 1: EXECUTIVE OVERVIEW -->
+        <section class="tab-content active" id="tab-overview">
+            <!-- Metric KPI Cards -->
+            <div class="kpi-grid">
+                <div class="kpi-card accent-red">
+                    <div class="kpi-header">
+                        <span class="kpi-title">野外悪用確認 (KEV 総数)</span>
+                        <span class="kpi-icon">🚨</span>
+                    </div>
+                    <div class="kpi-value" id="kpi-kev-total">---</div>
+                    <div class="kpi-subtext">CISA Known Exploited Vulnerabilities</div>
+                </div>
+
+                <div class="kpi-card accent-amber">
+                    <div class="kpi-header">
+                        <span class="kpi-title">金融アセット影響 HIGH</span>
+                        <span class="kpi-icon">🏦</span>
+                    </div>
+                    <div class="kpi-value" id="kpi-fin-high">---</div>
+                    <div class="kpi-subtext">VPN, AD, Banking, SWIFT関連</div>
+                </div>
+
+                <div class="kpi-card accent-purple">
+                    <div class="kpi-header">
+                        <span class="kpi-title">ランサムウェア悪用確認</span>
+                        <span class="kpi-icon">💀</span>
+                    </div>
+                    <div class="kpi-value" id="kpi-ransomware-count">---</div>
+                    <div class="kpi-subtext">Ransomware Campaign Use = Known</div>
+                </div>
+
+                <div class="kpi-card accent-blue">
+                    <div class="kpi-header">
+                        <span class="kpi-title">本日の脅威アナウンス</span>
+                        <span class="kpi-icon">📡</span>
+                    </div>
+                    <div class="kpi-value" id="kpi-news-total">---</div>
+                    <div class="kpi-subtext">JPCERT/CC, CISA, News統合</div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="dashboard-grid">
+                <!-- EPSS Risk Scatter Chart -->
+                <div class="card glass-card">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>
+                            CVSS 深刻度 × EPSS 悪用確率 優先対処マトリクス
+                        </h2>
+                        <span class="text-muted text-sm">右上象限：緊急対応が必要な脆弱性</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="chart-matrix"></canvas>
+                    </div>
+                </div>
+
+                <!-- Top Affected Financial Assets -->
+                <div class="card glass-card">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
+                            金融セクター主要ベンダ別 KEV件数分布
+                        </h2>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="chart-vendors"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Urgent Action Items Table -->
+            <div class="card glass-card margin-top">
+                <div class="card-header">
+                    <h2 class="card-title text-red">
+                        ⚡ 直近追加された金融警戒・野外悪用脆弱性 (KEV Top Pick)
+                    </h2>
+                </div>
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>CVE ID</th>
+                                <th>ベンダー / 製品</th>
+                                <th>脆弱性概要</th>
+                                <th>野外悪用 (In-the-Wild)</th>
+                                <th>金融アセット影響度</th>
+                                <th>ランサム悪用</th>
+                                <th>攻撃根拠・記事</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-recent-kev">
+                            <tr><td colspan="8" class="text-center py-4 text-muted">データを読み込み中...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- TAB 2: CISA KEV EXPLORER -->
+        <section class="tab-content" id="tab-kev">
+            <div class="filter-bar glass-card">
+                <div class="filter-group">
+                    <label class="filter-label">キーワード検索</label>
+                    <input type="text" id="input-kev-search" class="form-control" placeholder="CVE番号, ベンダー名, 製品名 (例: Fortinet, Palo Alto, Citrix, CVE-2024...)">
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">金融アセット影響度</label>
+                    <select id="select-kev-relevance" class="form-control">
+                        <option value="ALL">すべて表示</option>
+                        <option value="HIGH" selected>金融高影響 (HIGH) のみ</option>
+                        <option value="MEDIUM">中程度以上 (HIGH / MEDIUM)</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label class="filter-label">ランサムウェア利用</label>
+                    <select id="select-kev-ransomware" class="form-control">
+                        <option value="ALL">すべて表示</option>
+                        <option value="Known">悪用確認済み (Known)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="card glass-card margin-top">
+                <div class="table-header-info">
+                    <span id="kev-filtered-count" class="text-muted">表示件数: 0 件</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>CVE ID</th>
+                                <th>ベンダー / プロジェクト</th>
+                                <th>製品</th>
+                                <th>脆弱性名称 / 概要</th>
+                                <th>野外悪用 (In-the-Wild)</th>
+                                <th>対応期日</th>
+                                <th>金融影響度</th>
+                                <th>ランサム</th>
+                                <th>攻撃根拠・記事検索</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-kev-full">
+                            <tr><td colspan="10" class="text-center py-4 text-muted">データを読み込み中...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- TAB 3: VULNERABILITY & EPSS HUB -->
+        <section class="tab-content" id="tab-epss">
+            <div class="dashboard-grid grid-2-1">
+                <div class="card glass-card">
+                    <div class="card-header">
+                        <h2 class="card-title">🔍 CVE / EPSS 個別照会・リスク判定</h2>
+                    </div>
+                    <div class="cve-search-box">
+                        <input type="text" id="input-cve-query" class="form-control form-control-lg" placeholder="CVE番号を入力 (例: CVE-2024-21887, CVE-2023-3519)">
+                        <button class="btn btn-primary btn-lg" id="btn-cve-search">照会する</button>
+                    </div>
+
+                    <div id="cve-result-box" class="cve-result-container hidden margin-top">
+                        <!-- Dynamic CVE Details populated here -->
+                    </div>
+                </div>
+
+                <!-- EPSS Guide Card -->
+                <div class="card glass-card">
+                    <div class="card-header">
+                        <h2 class="card-title">📖 EPSS (Exploit Prediction Scoring System) とは</h2>
+                    </div>
+                    <div class="epss-guide-content">
+                        <p class="text-muted">
+                            EPSSはFIRST.orgが提供する、<strong>「今後30日以内にその脆弱性が実際の攻撃（野外）で悪用される確率」</strong>をAI/機械学習モデルで算出する動的スコアです。
+                        </p>
+
+                        <div class="guide-box accent-red-bg">
+                            <strong>🔴 EPSS > 0.5 (50%以上)</strong>
+                            <p>極めて高い確率で攻撃コードが出回っており、即時パッチ適用が必須です。</p>
+                        </div>
+
+                        <div class="guide-box accent-amber-bg margin-top-sm">
+                            <strong>🟡 EPSS 0.1 - 0.5 (10-50%)</strong>
+                            <p>主要な攻撃手法が存在。境界機器（VPN/Firewall）やAD環境では優先対処対象。</p>
+                        </div>
+
+                        <div class="guide-box accent-blue-bg margin-top-sm">
+                            <strong>🚨 野外悪用 (In-the-Wild) 悪用確認済み</strong>
+                            <p>CISA KEVに登録され、すでに実際の攻撃で悪用が確認された確定脅威です。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top EPSS High-Risk Vulnerabilities List -->
+            <div class="card glass-card margin-top">
+                <div class="card-header">
+                    <h2 class="card-title text-red">🔥 高EPSS悪用確率 注目脆弱性</h2>
+                </div>
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>CVE ID</th>
+                                <th>製品 / 概要</th>
+                                <th>EPSS 悪用確率</th>
+                                <th>パーセンタイル</th>
+                                <th>CVSS 深刻度</th>
+                                <th>野外悪用 (In-the-Wild)</th>
+                                <th>金融アセット影響度</th>
+                                <th>攻撃根拠検索</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-high-epss">
+                            <tr><td colspan="9" class="text-center py-4 text-muted">データを読み込み中...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- TAB 4: THREAT NEWS & RSS FEEDS -->
+        <section class="tab-content" id="tab-news">
+            <div class="filter-bar glass-card">
+                <div class="feed-tabs" id="feed-source-tabs">
+                    <button class="btn btn-sm btn-outline active" data-source="ALL">全ソース</button>
+                    <button class="btn btn-sm btn-outline" data-source="JPCERT/CC (Alerts)">JPCERT/CC</button>
+                    <button class="btn btn-sm btn-outline" data-source="CISA Advisories">CISA Advisories</button>
+                    <button class="btn btn-sm btn-outline" data-source="Dark Reading">Dark Reading</button>
+                    <button class="btn btn-sm btn-outline" data-source="SecurityWeek">SecurityWeek</button>
+                    <button class="btn btn-sm btn-outline" data-source="The Hacker News">The Hacker News</button>
+                </div>
+
+                <div class="filter-group margin-top-sm">
+                    <input type="text" id="input-news-search" class="form-control" placeholder="ニュース内を検索 (例: ランサムウェア, 金融, Fortinet, Banking...)">
+                </div>
+            </div>
+
+            <div class="news-grid margin-top" id="news-container">
+                <div class="text-center py-4 text-muted">ニュースフィードを取得中...</div>
+            </div>
+        </section>
+
+
+        <!-- TAB 5: BOOKMARKS & REPORT GENERATOR -->
+        <section class="tab-content" id="tab-bookmarks">
+            <div class="card glass-card">
+                <div class="card-header flex-between">
+                    <div>
+                        <h2 class="card-title">🔖 保存した脅威・社内報告用レポート出力</h2>
+                        <p class="text-muted text-sm">気になる脆弱性やニュースを保存し、CSIRT・金融庁/FISC報告用サマリーを瞬時に生成します。</p>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn btn-success" id="btn-export-markdown">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            Markdownレポート出力 (.md)
+                        </button>
+                        <button class="btn btn-danger btn-sm" id="btn-clear-bookmarks">全削除</button>
+                    </div>
+                </div>
+
+                <div class="margin-top" id="bookmarks-list">
+                    <div class="text-center py-4 text-muted">保存されたアイテムはありません。「保存」ボタンを押すとここに追加されます。</div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Modal Dialog for CVE / Threat Item Details -->
+    <div class="modal-overlay hidden" id="modal-overlay">
+        <div class="modal-card glass-card">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modal-cve-title">CVE-2024-XXXX</h2>
+                <button class="modal-close" id="modal-close-btn">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <!-- Dynamic detail content -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
