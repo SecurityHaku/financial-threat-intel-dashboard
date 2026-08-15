@@ -33,7 +33,7 @@
 ## 📁 プロジェクト構成
 
 ```
-02_threat-intelligence/
+financial-threat-intel-dashboard/
 ├── server.py        # ローカルAPIサーバー（フィード取得・キャッシュ・集計）
 ├── index.html        # ダッシュボード画面
 ├── app.js             # フロントエンドのロジック
